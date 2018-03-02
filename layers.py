@@ -1,13 +1,10 @@
-import math
-
+import numpy as np
 import torch
 import torch.nn as nn
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
 import torch.nn.functional as F
 
 
-class GraphAttentionLayer(Module):
+class GraphAttentionLayer(nn.Module):
     """
     Simple GAT layer, similar to https://arxiv.org/abs/1710.10903
     """
@@ -20,17 +17,10 @@ class GraphAttentionLayer(Module):
         self.alpha = alpha
         self.concat = concat
 
-        self.W = Parameter(torch.Tensor(in_features, out_features))
-        self.a = Parameter(torch.Tensor(2*out_features, 1))
+        self.W = nn.Parameter(nn.init.xavier_uniform(torch.Tensor(in_features, out_features).type(torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor), gain=np.sqrt(2.0)), requires_grad=True)
+        self.a = nn.Parameter(nn.init.xavier_uniform(torch.Tensor(2*out_features, 1).type(torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor), gain=np.sqrt(2.0)), requires_grad=True)
+
         self.leakyrelu = nn.LeakyReLU(self.alpha)
-
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.W.size(1))
-        self.W.data.uniform_(-stdv, stdv)
-        if self.a is not None:
-            self.a.data.uniform_(-stdv, stdv)
 
     def forward(self, input, adj):
         h = torch.mm(input, self.W)
