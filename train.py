@@ -42,7 +42,7 @@ if args.cuda:
 adj, features, labels, idx_train, idx_val, idx_test = load_data()
 
 # Model and optimizer
-model = GAT(nfeat=features.shape[1], nhid=args.hidden, nclass=labels.max() + 1, dropout=args.dropout, nheads=args.nb_heads, alpha=args.alpha)
+model = GAT(nfeat=features.shape[1], nhid=args.hidden, nclass=int(labels.max()) + 1, dropout=args.dropout, nheads=args.nb_heads, alpha=args.alpha)
 optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
 if args.cuda:
