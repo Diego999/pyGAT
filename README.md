@@ -19,7 +19,7 @@ The repo has been forked initially from https://github.com/tkipf/pygcn. The offi
 
 # Performances
 
-The training of the transductive learning on Cora task on a Titan Xp takes ~0.9 sec per epoch and 10-15 minutes for the whole training (~800 epochs). The final accuracy is between 83.6 and 84.6 (obtained on 3 different runs).
+The training of the transductive learning on Cora task on a Titan Xp takes ~0.9 sec per epoch and 10-15 minutes for the whole training (~800 epochs). The final accuracy is between 83.6 and 84.7 (obtained on 3 different runs).
 
 A small note about initial sparse matrix operations of https://github.com/tkipf/pygcn: they have been removed. Therefore, the current model take ~7GB on GRAM.
 
