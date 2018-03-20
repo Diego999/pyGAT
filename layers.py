@@ -28,6 +28,8 @@ class GraphAttentionLayer(nn.Module):
         self.leakyrelu = nn.LeakyReLU(self.alpha)
 
     def forward(self, input, adj):
+        input = F.dropout(input, self.dropout, training=self.training)
+
         seq = torch.transpose(input, 0, 1).unsqueeze(0)
         seq_fts = self.seq_transformation(seq)
 
