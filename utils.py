@@ -29,13 +29,26 @@ def load_data(path="./data/cora/", dataset="cora"):
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
 
     features = normalize_features(features)
-    adj = normalize_adj(adj + sp.eye(adj.shape[0]))
+    # Implementation from paper
+    #adj = normalize_adj(adj + sp.eye(adj.shape[0]))
+    #adj = torch.FloatTensor(np.array(adj.todense()))
+
+    # Tricky implementation of official GAT
+    adj = (adj + sp.eye(adj.shape[0])).todense()
+    for x in range(0, adj.shape[0]):
+        for y in range(0, adj.shape[1]):
+            if adj[x,y] == 0:
+                adj[x,y] = -9e15
+            elif adj[x,y] == 1:
+                adj[x,y] = 0
+            else:
+                print(adj[x,y], 'error')
+    adj = torch.FloatTensor(np.array(adj))
 
     idx_train = range(140)
     idx_val = range(200, 500)
     idx_test = range(500, 1500)
 
-    adj = torch.FloatTensor(np.array(adj.todense()))
     features = torch.FloatTensor(np.array(features.todense()))
     labels = torch.LongTensor(np.where(labels)[1])
 
