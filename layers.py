@@ -43,9 +43,9 @@ class GraphAttentionLayer(nn.Module):
 
         if self.residual:
             if seq.size()[-1] != ret.size()[-1]:
-                ret += self.proj_residual(seq).squeeze(2)
+                ret += torch.transpose(self.proj_residual(seq).squeeze(0), 0, 1)
             else:
-                ret += seq
+                ret += input
 
         if self.concat:
             return F.elu(ret)
