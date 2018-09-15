@@ -18,10 +18,10 @@ class GraphAttentionLayer(nn.Module):
         self.concat = concat
 
         self.W = nn.Parameter(torch.zeros(size=(in_features, out_features)))
-        nn.init.normal_(self.W.data, std=0.01)
+        nn.init.xavier_normal_(self.W.data, gain=1.414)
                 
         self.a = nn.Parameter(torch.zeros(size=(1, 2*out_features)))
-        nn.init.normal_(self.a.data, std=0.01)
+        nn.init.xavier_normal_(self.a.data, gain=1.414)
 
         self.leakyrelu = nn.LeakyReLU(self.alpha)
 
@@ -31,13 +31,13 @@ class GraphAttentionLayer(nn.Module):
 
         h = torch.mm(input, self.W)
         # h: N x out
-        assert not torch.any(torch.isnan(h))
+        assert not torch.isnan(h).any()
 
         # Self-attention on the nodes - Shared attention mechanism
         edge_h = torch.cat((h[edge[0, :], :], h[edge[1, :], :]), dim=1).t()
         # edge: 2*D x E
         edge_e = torch.exp(-self.leakyrelu(self.a.mm(edge_h).squeeze()))
-        assert not torch.any(torch.isnan(edge_e))
+        assert not torch.isnan(edge_e).any()
         # edge_e: 1 x E
         e = torch.sparse_coo_tensor(edge, edge_e, torch.Size([N, N]))
         # e: N x N
@@ -47,11 +47,11 @@ class GraphAttentionLayer(nn.Module):
         # e_rowsum: N x 1
 
         h_prime = torch.matmul(e, h)
-        assert not torch.any(torch.isnan(h_prime))
+        assert not torch.isnan(h_prime).any()
         
         h_prime = h_prime.div(e_rowsum)
         # h_prime: N x out
-        assert not torch.any(torch.isnan(h_prime))
+        assert not torch.isnan(h_prime).any()
 
         if self.concat:
             # if this layer is not last layer,
