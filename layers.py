@@ -11,7 +11,6 @@ class GraphAttentionLayer(nn.Module):
 
     def __init__(self, in_features, out_features, dropout, alpha, concat=True):
         super(GraphAttentionLayer, self).__init__()
-        self.dropout = dropout
         self.in_features = in_features
         self.out_features = out_features
         self.alpha = alpha
@@ -23,6 +22,7 @@ class GraphAttentionLayer(nn.Module):
         self.a = nn.Parameter(torch.zeros(size=(1, 2*out_features)))
         nn.init.xavier_normal_(self.a.data, gain=1.414)
 
+        self.dropout = nn.Dropout(dropout)
         self.leakyrelu = nn.LeakyReLU(self.alpha)
 
     def forward(self, input, adj):
@@ -41,11 +41,13 @@ class GraphAttentionLayer(nn.Module):
         # edge_e: 1 x E
         e = torch.sparse_coo_tensor(edge, edge_e, torch.Size([N, N]))
         # e: N x N
-
         e_rowsum = torch.matmul(e, torch.ones(size=(N, 1)).cuda())
-        #e_rowsum = torch.where(e_rowsum<1e-6, torch.full_like(e_rowsum, 1e-6), e_rowsum)
         # e_rowsum: N x 1
 
+        edge_e = self.dropout(edge_e)
+        # edge_e: 1 x E
+        e = torch.sparse_coo_tensor(edge, edge_e, torch.Size([N, N]))
+        # e: N x N
         h_prime = torch.matmul(e, h)
         assert not torch.isnan(h_prime).any()
         
