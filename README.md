@@ -27,7 +27,7 @@ A small note about initial sparse matrix operations of https://github.com/tkipf/
 
 # Requirements
 
-pyGAT relies on Python 3.5 and PyTorch 0.4 (due to torch.where).
+pyGAT relies on Python 3.5 and PyTorch 0.4.1 (due to torch.sparse_coo_tensor).
 
 # Issues/Pull Requests/Feedbacks
 

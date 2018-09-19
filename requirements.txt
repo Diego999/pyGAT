@@ -1,3 +1,8 @@
-torch==0.4.0a0+1fdb392
-scipy==0.19.1
-numpy==1.14.0
+certifi==2018.8.24
+cffi==1.11.5
+mkl-fft==1.0.4
+mkl-random==1.0.1
+numpy==1.15.1
+pycparser==2.18
+scipy==1.1.0
+torch==0.4.1.post2
