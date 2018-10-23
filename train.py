@@ -111,7 +111,6 @@ def compute_test():
           "loss= {:.4f}".format(loss_test.data[0]),
           "accuracy= {:.4f}".format(acc_test.data[0]))
 
-
 # Train model
 t_total = time.time()
 loss_values = []
