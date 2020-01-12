@@ -19,10 +19,14 @@ class GraphAttentionLayer(nn.Module):
         self.residual = residual
 
         self.seq_transformation = nn.Conv1d(in_features, out_features, kernel_size=1, stride=1, bias=False)
+        torch.nn.init.xavier_uniform(self.seq_transformation.weight)
         if self.residual:
             self.proj_residual = nn.Conv1d(in_features, out_features, kernel_size=1, stride=1)
+            torch.nn.init.xavier_uniform(self.proj_residual.weight)
         self.f_1 = nn.Conv1d(out_features, 1, kernel_size=1, stride=1)
+        torch.nn.init.xavier_uniform(self.f_1.weight)
         self.f_2 = nn.Conv1d(out_features, 1, kernel_size=1, stride=1)
+        torch.nn.init.xavier_uniform(self.f_2.weight)
         self.bias = nn.Parameter(torch.zeros(out_features).type(torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor), requires_grad=True)
 
         self.leakyrelu = nn.LeakyReLU(self.alpha)
