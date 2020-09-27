@@ -52,8 +52,8 @@ class GraphAttentionLayer(nn.Module):
         # e1, e2, ..., eN, e1, e2, ..., eN, ..., e1, e2, ..., eN 
         # '----------------------------------------------------' -> N times
         # 
-
-        Wh_repeated_in_chunks = Wh.repeat(1, N).view(N * N, self.out_features)
+        
+        Wh_repeated_in_chunks = Wh.repeat_interleave(N, dim=0)
         Wh_repeated_alternating = Wh.repeat(N, 1)
         # Wh_repeated_in_chunks.shape == Wh_repeated_alternating.shape == (N * N, out_features)
 
