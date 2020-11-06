@@ -4,7 +4,9 @@ import torch
 
 
 def encode_onehot(labels):
-    classes = set(labels)
+    # The classes must be sorted before encoding to enable static class encoding.
+    # In other words, make sure the first class always maps to index 0.
+    classes = sorted(list(set(labels)))
     classes_dict = {c: np.identity(len(classes))[i, :] for i, c in enumerate(classes)}
     labels_onehot = np.array(list(map(classes_dict.get, labels)), dtype=np.int32)
     return labels_onehot
