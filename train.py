@@ -108,8 +108,8 @@ def compute_test():
     loss_test = F.nll_loss(output[idx_test], labels[idx_test])
     acc_test = accuracy(output[idx_test], labels[idx_test])
     print("Test set results:",
-          "loss= {:.4f}".format(loss_test.data[0]),
-          "accuracy= {:.4f}".format(acc_test.data[0]))
+          "loss= {:.4f}".format(loss_test.data.item()),
+          "accuracy= {:.4f}".format(acc_test.data.item()))
 
 # Train model
 t_total = time.time()
