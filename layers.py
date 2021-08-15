@@ -25,8 +25,7 @@ class GraphAttentionLayer(nn.Module):
 
     def forward(self, h, adj):
         Wh = torch.mm(h, self.W) # h.shape: (N, in_features), Wh.shape: (N, out_features)
-        a_input = self._prepare_attentional_mechanism_input(Wh)
-        e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))
+        e = self._prepare_attentional_mechanism_input(Wh)
 
         zero_vec = -9e15*torch.ones_like(e)
         attention = torch.where(adj > 0, e, zero_vec)
@@ -40,45 +39,15 @@ class GraphAttentionLayer(nn.Module):
             return h_prime
 
     def _prepare_attentional_mechanism_input(self, Wh):
-        N = Wh.size()[0] # number of nodes
-
-        # Below, two matrices are created that contain embeddings in their rows in different orders.
-        # (e stands for embedding)
-        # These are the rows of the first matrix (Wh_repeated_in_chunks): 
-        # e1, e1, ..., e1,            e2, e2, ..., e2,            ..., eN, eN, ..., eN
-        # '-------------' -> N times  '-------------' -> N times       '-------------' -> N times
-        # 
-        # These are the rows of the second matrix (Wh_repeated_alternating): 
-        # e1, e2, ..., eN, e1, e2, ..., eN, ..., e1, e2, ..., eN 
-        # '----------------------------------------------------' -> N times
-        # 
-        
-        Wh_repeated_in_chunks = Wh.repeat_interleave(N, dim=0)
-        Wh_repeated_alternating = Wh.repeat(N, 1)
-        # Wh_repeated_in_chunks.shape == Wh_repeated_alternating.shape == (N * N, out_features)
-
-        # The all_combination_matrix, created below, will look like this (|| denotes concatenation):
-        # e1 || e1
-        # e1 || e2
-        # e1 || e3
-        # ...
-        # e1 || eN
-        # e2 || e1
-        # e2 || e2
-        # e2 || e3
-        # ...
-        # e2 || eN
-        # ...
-        # eN || e1
-        # eN || e2
-        # eN || e3
-        # ...
-        # eN || eN
-
-        all_combinations_matrix = torch.cat([Wh_repeated_in_chunks, Wh_repeated_alternating], dim=1)
-        # all_combinations_matrix.shape == (N * N, 2 * out_features)
-
-        return all_combinations_matrix.view(N, N, 2 * self.out_features)
+        # Wh.shape (N, out_feature)
+        # self.a.shape (2 * out_feature, 1)
+        # Wh1&2.shape (N, 1)
+        # e.shape (N, N)
+        Wh1 = torch.matmul(Wh, self.a[:self.out_features, :])
+        Wh2 = torch.matmul(Wh, self.a[self.out_features:, :])
+        # broadcast add
+        e = Wh1 + Wh2.T
+        return self.leakyrelu(e)
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_features) + ' -> ' + str(self.out_features) + ')'
